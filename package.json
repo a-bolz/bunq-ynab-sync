@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "typecheck": "tsc --pretty --noEmit",
-    "transpile": "tsc src/index.ts",
+    "transpile": "tsc",
     "start": "npm run transpile && node dist/index.js"
   },
   "repository": {
