@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/a-bolz/ts-2024#readme",
   "devDependencies": {
+    "@types/node": "^20.12.3",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "eslint": "^8.57.0",
     "eslint-config-standard-with-typescript": "^43.0.1",
