@@ -6,7 +6,6 @@ dotenv.config()
 const hello = (arg: string): void => {
   console.log(bunq)
   console.log(arg)
-  bunq.registerCallbacks()
 }
 
 hello('world')

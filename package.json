@@ -7,7 +7,8 @@
   "scripts": {
     "typecheck": "tsc --pretty --noEmit",
     "transpile": "tsc",
-    "start": "npm run transpile && node dist/index.js"
+    "start": "npm run transpile && node dist/index.js",
+    "start:bunq": "npm run transpile && node dist/bunq/index.js"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,7 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "node-fetch": "^3.3.2"
   }
 }
