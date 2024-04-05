@@ -206,7 +206,6 @@ async function createSession (installationToken: string): Promise<{ sessionToken
     throw new Error(`API call failed: ${response.status}`)
   }
 
-  console.log('Session created successfully:', JSON.stringify(data, null, 2))
   // Extract and return the session token from the response for future API calls
   const sessionToken = data?.Response[1].Token.token // Adjust based on actual API response structure
   const userId = data?.Response[2].UserPerson.id
@@ -243,15 +242,20 @@ async function setupBunqClient (): Promise<{ userId: string, sessionToken: strin
      * @param callbackUrl The URL to which bunq should send notifications about MUTATION events.
       * @returns A promise that resolves when the callback has been successfully registered.
        */
-export async function registerCallBack (sessionToken: string, userID: string, callbackUrl: string): Promise<void> {
-  console.log('starting registerCallback \n')
+export async function updateCallBacks (sessionToken: string, userID: string, callbackUrl?: string): Promise<void> {
+  console.log('starting registerCallback \n', callbackUrl)
+  /*
+  if no callbackUrl is provided all callbacks are deregistered in this method
+  */
   const body = JSON.stringify({
-    notification_filters: [
-      {
-        category: 'MUTATION',
-        notification_target: callbackUrl
-      }
-    ]
+    notification_filters: callbackUrl
+      ? [
+          {
+            category: 'MUTATION',
+            notification_target: callbackUrl
+          }
+        ]
+      : []
   })
 
   const signature = generateSignature(body)
@@ -263,8 +267,6 @@ export async function registerCallBack (sessionToken: string, userID: string, ca
     'X-Bunq-Client-Signature': signature
     // Include other required headers as specified in the bunq documentation
   }
-
-  console.log({ endpoint, headers, body })
 
   const response = await fetch(`${bunqApiUrl}${endpoint}`, {
     method: 'POST',
@@ -304,14 +306,43 @@ export async function listActiveCallbacks (sessionToken: string, userID: string)
     throw new Error(`API call failed: ${response.status}`)
   }
 
-  console.log('listingActiveCallbacks:', JSON.stringify(data, null, 2))
+  const activeCallbacks = (data?.Response ?? []).map((r: { NotificationFilterUrl: { notification_target: string } }) => r.NotificationFilterUrl.notification_target)
+
+  console.log('listingActiveCallbacks:', JSON.stringify(activeCallbacks, null, 2))
+
+  return activeCallbacks
 }
 
-async function doIt () {
-  /// const callbackUrl = process.env['CALLBACK_URL'] ?? 'https://73e3-213-93-46-208.ngrok-free.app'
+export async function idempotentlyRegisterCallback () {
+  const callbackUrl = process.env['CALLBACK_URL'] ?? 'https://21be-213-93-46-208.ngrok-free.app'
+  console.log(`Starting process to register mutation callbacks to ${callbackUrl} \n`)
+
+  console.log('Setting up bunq session \n')
   const { sessionToken, userId } = await setupBunqClient()
-  await listActiveCallbacks(sessionToken, userId)
-  // await registerCallBack(sessionToken, userId, callbackUrl)
+
+  console.log('Checking if current url is already registered for callbacks \n')
+  const callbackNotificationTargets = await listActiveCallbacks(sessionToken, userId)
+
+  if (callbackNotificationTargets.includes(callbackUrl)) {
+    console.log(`${callbackUrl} is already present in ${JSON.stringify(callbackNotificationTargets)}, returning early`)
+    return
+  }
+
+  console.log('Current url is not yet registered. First deregistering all pre existing callbacks \n')
+  await updateCallBacks(sessionToken, userId, undefined) // this deregisteres all callbacks
+
+  console.log('registered Callbacks should now be empty, checking')
+  const hopefullyEmptyTargetList = await listActiveCallbacks(sessionToken, userId)
+  console.log('result: ', hopefullyEmptyTargetList)
+
+  console.log('Finally, registering new callback for', callbackUrl)
+  await updateCallBacks(sessionToken, userId, callbackUrl) // this deregisteres all callbacks
+
+  console.log('checking if succss')
+  const listWithNewCallback = await listActiveCallbacks(sessionToken, userId)
+  console.log('result: ', listWithNewCallback)
+
+  if (!listWithNewCallback.includes(callbackUrl)) throw new Error('Registering callback process somehow failed')
 }
 
-doIt()
+idempotentlyRegisterCallback()
