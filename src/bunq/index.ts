@@ -1,4 +1,5 @@
-import { loadKey, generateSignature } from './keys.js'
+import { generateSignature } from './keys.js'
+import { readTmpFile } from './files.js'
 import fetch from 'node-fetch'
 import dotenv from 'dotenv'
 
@@ -45,8 +46,8 @@ const bunqApiUrl = process.env['BUNQ_BASE_URL']!
    *
    * @returns Promise<{ installationToken: string, serverPublicKey: string }>
    */
-async function registerPublicKey (): Promise<{ installationToken: string, serverPublicKey: string }> {
-  const publicKey = loadKey('public.pem')
+export async function registerPublicKey (): Promise<{ installationToken: string, serverPublicKey: string }> {
+  const publicKey = readTmpFile('public.pem')
   const requestBody = JSON.stringify({
     client_public_key: publicKey
   })
@@ -97,7 +98,7 @@ async function registerPublicKey (): Promise<{ installationToken: string, server
    *
    * For more information on handling dynamic IPs with API keys, visit: https://bunq.com/en/apikey-dynamic-ip
  */
-async function registerDevice (installationToken: string) {
+export async function registerDevice (installationToken: string) {
   const requestBody = JSON.stringify({
     description: 'my mb pro',
     secret: process?.env?.['BUNQ_API_KEY'],
@@ -163,6 +164,8 @@ async function createSession (installationToken: string): Promise<string> {
 
   const signature = generateSignature(method, endpoint, headers, body)
 
+  console.log({ method, endpoint, headers, body, signature })
+
   const response = await fetch(`${bunqApiUrl}${endpoint}`, {
     method,
     headers: {
@@ -176,7 +179,7 @@ async function createSession (installationToken: string): Promise<string> {
 
   if (!response.ok) {
     console.error('API call failed with status:', response.status)
-    console.error('Error response body:', data)
+    console.error('Error response body:', JSON.stringify(data, null, 2))
     throw new Error(`API call failed: ${response.status}`)
   }
 
@@ -189,14 +192,15 @@ async function createSession (installationToken: string): Promise<string> {
 // Example usage
 async function setupBunqClient () {
   try {
-    console.log('attempting to register public key \n')
-    const { installationToken } = await registerPublicKey()
-    console.log('public key registered succsefully', installationToken, '\n')
+    // console.log('attempting to register public key \n')
+    // const { installationToken } = await registerPublicKey()
+    // console.log('public key registered succsefully', installationToken, '\n')
 
-    console.log('attempting to register device \n')
-    const { deviceServerId } = await registerDevice(installationToken)
-    console.log(`succesfully registerd device: id = ${deviceServerId} \n`)
+    // console.log('attempting to register device \n')
+    // const { deviceServerId } = await registerDevice(installationToken)
+    // console.log(`succesfully registerd device: id = ${deviceServerId} \n`)
 
+    const installationToken = ''
     console.log('Creating session \n')
     await createSession(installationToken)
     console.log('Bunq client setup completed successfully.')
