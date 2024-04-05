@@ -31,4 +31,13 @@ provides a high level architectural overview.
 6. Whenever a callback comes in, the node process (server) handles the
 callback and forwards it to ynab (more detail to follow here).
 
+## Initializing a BUNQ session
 
+The tmp folder will need to contain a public.pem and private.pem file
+
+these have been generated using
+
+openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
+openssl rsa -pubout -in private.pem -out public.pem
+
+als the required environment variables need to be set (see .env.sample).
