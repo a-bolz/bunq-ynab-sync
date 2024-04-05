@@ -189,8 +189,6 @@ async function createSession (installationToken: string): Promise<{ sessionToken
 
   const signature = generateSignature(body)
 
-  console.log({ method, endpoint, headers, body, signature })
-
   const response = await fetch(`${bunqApiUrl}${endpoint}`, {
     method,
     headers: {
@@ -216,7 +214,7 @@ async function createSession (installationToken: string): Promise<{ sessionToken
 }
 
 // Example usage
-async function setupBunqClient (): Promise<{ userId: string, installationToken: string } > {
+async function setupBunqClient (): Promise<{ userId: string, sessionToken: string } > {
   try {
     console.log('attempting to register public key \n')
     const { installationToken } = await registerPublicKey()
@@ -227,10 +225,10 @@ async function setupBunqClient (): Promise<{ userId: string, installationToken: 
     console.log(`succesfully registerd device: id = ${deviceServerId} \n`)
 
     console.log('Creating session \n')
-    const { userId } = await createSession(installationToken)
+    const { userId, sessionToken } = await createSession(installationToken)
     console.log('Bunq Session opened succesfully \n')
 
-    return { installationToken, userId }
+    return { sessionToken, userId }
   } catch (error) {
     console.error('Failed to setup Bunq client:', error)
     throw error
@@ -245,14 +243,8 @@ async function setupBunqClient (): Promise<{ userId: string, installationToken: 
      * @param callbackUrl The URL to which bunq should send notifications about MUTATION events.
       * @returns A promise that resolves when the callback has been successfully registered.
        */
-async function registerCallBack (installationToken: string, userID: string, callbackUrl: string): Promise<void> {
-  const endpoint = `/user/${userID}/notification-filter-url`
-  const headers = {
-    'Content-Type': 'application/json',
-    'User-Agent': 'Andreas MBPRO', // Customize with your actual User-Agent
-    'X-Bunq-Client-Authentication': installationToken
-    // Include other required headers as specified in the bunq documentation
-  }
+async function registerCallBack (sessionToken: string, userID: string, callbackUrl: string): Promise<void> {
+  console.log('starting registerCallback \n')
   const body = JSON.stringify({
     notification_filters: [
       {
@@ -261,6 +253,18 @@ async function registerCallBack (installationToken: string, userID: string, call
       }
     ]
   })
+
+  const signature = generateSignature(body)
+  const endpoint = `/user/${userID}/notification-filter-url`
+  const headers = {
+    'Content-Type': 'application/json',
+    'User-Agent': 'Andreas MBPRO', // Customize with your actual User-Agent
+    'X-Bunq-Client-Authentication': sessionToken,
+    'X-Bunq-Client-Signature': signature
+    // Include other required headers as specified in the bunq documentation
+  }
+
+  console.log({ endpoint, headers, body })
 
   const response = await fetch(`${bunqApiUrl}${endpoint}`, {
     method: 'POST',
@@ -280,9 +284,9 @@ async function registerCallBack (installationToken: string, userID: string, call
 }
 
 async function doIt () {
-  const callbackUrl = process.env['CALLBACK_URL'] ?? 'https://54e4-213-93-46-208.ngrok-free.app'
-  const { installationToken, userId } = await setupBunqClient()
-  await registerCallBack(installationToken, userId, callbackUrl)
+  const callbackUrl = process.env['CALLBACK_URL'] ?? 'https://73e3-213-93-46-208.ngrok-free.app'
+  const { sessionToken, userId } = await setupBunqClient()
+  await registerCallBack(sessionToken, userId, callbackUrl)
 }
 
 doIt()
