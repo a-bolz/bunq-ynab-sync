@@ -175,7 +175,7 @@ export async function registerDevice (installationToken: string) {
    * @param {string} installationToken - The installation token obtained from a successful /installation call.
    * @returns A promise that resolves with the session token and user information upon successful session creation.
    */
-async function createSession (installationToken: string): Promise<string> {
+async function createSession (installationToken: string): Promise<{ sessionToken: string, userId: string }> {
   const method = 'POST'
   const endpoint = '/session-server'
   const headers = {
@@ -211,11 +211,12 @@ async function createSession (installationToken: string): Promise<string> {
   console.log('Session created successfully:', JSON.stringify(data, null, 2))
   // Extract and return the session token from the response for future API calls
   const sessionToken = data?.Response[1].Token.token // Adjust based on actual API response structure
-  return sessionToken
+  const userId = data?.Response[2].UserPerson.id
+  return { sessionToken, userId }
 }
 
 // Example usage
-async function setupBunqClient () {
+async function setupBunqClient (): Promise<{ userId: string, installationToken: string } > {
   try {
     console.log('attempting to register public key \n')
     const { installationToken } = await registerPublicKey()
@@ -226,11 +227,62 @@ async function setupBunqClient () {
     console.log(`succesfully registerd device: id = ${deviceServerId} \n`)
 
     console.log('Creating session \n')
-    await createSession(installationToken)
-    console.log('Bunq client setup completed successfully.')
+    const { userId } = await createSession(installationToken)
+    console.log('Bunq Session opened succesfully \n')
+
+    return { installationToken, userId }
   } catch (error) {
     console.error('Failed to setup Bunq client:', error)
+    throw error
   }
 }
 
-setupBunqClient()
+/**
+ * Registers a callback URL for receiving notifications about MUTATION events.
+  *
+   * @param installationToken The installation token obtained from a successful installation.
+    * @param userID The user ID for which to register the callback.
+     * @param callbackUrl The URL to which bunq should send notifications about MUTATION events.
+      * @returns A promise that resolves when the callback has been successfully registered.
+       */
+async function registerCallBack (installationToken: string, userID: string, callbackUrl: string): Promise<void> {
+  const endpoint = `/user/${userID}/notification-filter-url`
+  const headers = {
+    'Content-Type': 'application/json',
+    'User-Agent': 'Andreas MBPRO', // Customize with your actual User-Agent
+    'X-Bunq-Client-Authentication': installationToken
+    // Include other required headers as specified in the bunq documentation
+  }
+  const body = JSON.stringify({
+    notification_filters: [
+      {
+        category: 'MUTATION',
+        notification_target: callbackUrl
+      }
+    ]
+  })
+
+  const response = await fetch(`${bunqApiUrl}${endpoint}`, {
+    method: 'POST',
+    headers,
+    body
+  })
+
+  const data = await response.json() as any
+
+  if (!response.ok) {
+    console.error('API call failed with status:', response.status)
+    console.error('Error response body:', JSON.stringify(data, null, 2))
+    throw new Error(`API call failed: ${response.status}`)
+  }
+
+  console.log('Callback registered successfully:', JSON.stringify(data, null, 2))
+}
+
+async function doIt () {
+  const callbackUrl = process.env['CALLBACK_URL'] ?? 'https://54e4-213-93-46-208.ngrok-free.app'
+  const { installationToken, userId } = await setupBunqClient()
+  await registerCallBack(installationToken, userId, callbackUrl)
+}
+
+doIt()
