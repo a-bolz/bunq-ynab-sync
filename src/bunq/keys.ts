@@ -1,13 +1,11 @@
 import { createSign } from 'crypto'
-import { readTmpFile } from './files'
+import { readTmpFile } from './files.js'
 
-export function generateSignature (method: string, endpoint: string, headers: object, body: string): string {
+export function generateSignature (body: string): string {
   // Example of constructing the data string to sign
-  const dataToSign = `${method} ${endpoint}\n${Object.keys(headers).sort().map(key => `${key}: ${(headers as any)[key]}`).join('\n')}\n\n${body}`
-
   // Create the sign object with SHA-256
   const sign = createSign('SHA256')
-  sign.update(dataToSign)
+  sign.update(body)
   sign.end()
 
   const privateKey = readTmpFile('private.pem')

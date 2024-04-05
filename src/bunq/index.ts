@@ -1,5 +1,5 @@
 import { generateSignature } from './keys.js'
-import { readTmpFile } from './files.js'
+import { readTmpFile, writeTmpFile } from './files.js'
 import fetch from 'node-fetch'
 import dotenv from 'dotenv'
 
@@ -47,6 +47,16 @@ const bunqApiUrl = process.env['BUNQ_BASE_URL']!
    * @returns Promise<{ installationToken: string, serverPublicKey: string }>
    */
 export async function registerPublicKey (): Promise<{ installationToken: string, serverPublicKey: string }> {
+  const dataFilename = 'installationData.json'
+
+  try {
+    const dataString = readTmpFile(dataFilename)
+    console.log('reading public key data from file')
+    return JSON.parse(dataString)
+  } catch (error) {
+    console.log('Stil need to register public key')
+  }
+
   const publicKey = readTmpFile('public.pem')
   const requestBody = JSON.stringify({
     client_public_key: publicKey
@@ -69,10 +79,14 @@ export async function registerPublicKey (): Promise<{ installationToken: string,
     throw new Error(`API call failed: ${response.status}`)
   }
 
-  return {
+  const installationData = {
     installationToken: data.Response[1].Token.token,
     serverPublicKey: data.Response[2].ServerPublicKey.server_public_key
   }
+
+  writeTmpFile(dataFilename, JSON.stringify(installationData, null, 2))
+
+  return installationData
 }
 
 /**
@@ -99,6 +113,15 @@ export async function registerPublicKey (): Promise<{ installationToken: string,
    * For more information on handling dynamic IPs with API keys, visit: https://bunq.com/en/apikey-dynamic-ip
  */
 export async function registerDevice (installationToken: string) {
+  const dataFilename = 'deviceData.json'
+
+  try {
+    const dataString = readTmpFile(dataFilename)
+    console.log('reading device data from file')
+    return JSON.parse(dataString)
+  } catch (error) {
+    console.log('Stil need to register device. Talking to bunq next')
+  }
   const requestBody = JSON.stringify({
     description: 'my mb pro',
     secret: process?.env?.['BUNQ_API_KEY'],
@@ -123,7 +146,9 @@ export async function registerDevice (installationToken: string) {
     throw new Error(`API call failed: ${response.status}`)
   }
 
-  return { deviceServerId: data?.Response?.[0].Id.id }
+  const deviceData = { deviceServerId: data?.Response?.[0].Id.id }
+  writeTmpFile(dataFilename, JSON.stringify(deviceData, null, 2))
+  return deviceData
 }
 
 /**
@@ -162,7 +187,7 @@ async function createSession (installationToken: string): Promise<string> {
     secret: process.env['BUNQ_API_KEY'] // Your bunq API Key
   })
 
-  const signature = generateSignature(method, endpoint, headers, body)
+  const signature = generateSignature(body)
 
   console.log({ method, endpoint, headers, body, signature })
 
@@ -192,15 +217,14 @@ async function createSession (installationToken: string): Promise<string> {
 // Example usage
 async function setupBunqClient () {
   try {
-    // console.log('attempting to register public key \n')
-    // const { installationToken } = await registerPublicKey()
-    // console.log('public key registered succsefully', installationToken, '\n')
+    console.log('attempting to register public key \n')
+    const { installationToken } = await registerPublicKey()
+    console.log('public key registered succsefully', installationToken, '\n')
 
-    // console.log('attempting to register device \n')
-    // const { deviceServerId } = await registerDevice(installationToken)
-    // console.log(`succesfully registerd device: id = ${deviceServerId} \n`)
+    console.log('attempting to register device \n')
+    const { deviceServerId } = await registerDevice(installationToken)
+    console.log(`succesfully registerd device: id = ${deviceServerId} \n`)
 
-    const installationToken = ''
     console.log('Creating session \n')
     await createSession(installationToken)
     console.log('Bunq client setup completed successfully.')

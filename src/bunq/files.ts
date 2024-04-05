@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'url'
 import { join, dirname } from 'path'
-import { writeFileSync, readFileSync } from 'fs'
+import { writeFileSync, readFileSync, existsSync } from 'fs'
 
 export function getDirname (metaUrl: string): string {
   const filename = fileURLToPath(metaUrl)
@@ -31,6 +31,9 @@ export function readTmpFile (fileName: string) {
     'tmp',
     fileName
   )
+
+  if (!existsSync(path)) throw new Error('File does not exist')
+
   try {
     return readFileSync(path, 'utf-8')
   } catch (error) {
