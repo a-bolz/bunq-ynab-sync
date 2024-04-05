@@ -243,7 +243,7 @@ async function setupBunqClient (): Promise<{ userId: string, sessionToken: strin
      * @param callbackUrl The URL to which bunq should send notifications about MUTATION events.
       * @returns A promise that resolves when the callback has been successfully registered.
        */
-async function registerCallBack (sessionToken: string, userID: string, callbackUrl: string): Promise<void> {
+export async function registerCallBack (sessionToken: string, userID: string, callbackUrl: string): Promise<void> {
   console.log('starting registerCallback \n')
   const body = JSON.stringify({
     notification_filters: [
@@ -283,10 +283,35 @@ async function registerCallBack (sessionToken: string, userID: string, callbackU
   console.log('Callback registered successfully:', JSON.stringify(data, null, 2))
 }
 
+export async function listActiveCallbacks (sessionToken: string, userID: string) {
+  const endpoint = `/user/${userID}/notification-filter-url`
+  const headers = {
+    'Content-Type': 'application/json',
+    'User-Agent': 'Andreas MBPRO', // Customize with your actual User-Agent
+    'X-Bunq-Client-Authentication': sessionToken
+  }
+
+  const response = await fetch(`${bunqApiUrl}${endpoint}`, {
+    method: 'GET',
+    headers
+  })
+
+  const data = await response.json() as any
+
+  if (!response.ok) {
+    console.error('API call failed with status:', response.status)
+    console.error('Error response body:', JSON.stringify(data, null, 2))
+    throw new Error(`API call failed: ${response.status}`)
+  }
+
+  console.log('listingActiveCallbacks:', JSON.stringify(data, null, 2))
+}
+
 async function doIt () {
-  const callbackUrl = process.env['CALLBACK_URL'] ?? 'https://73e3-213-93-46-208.ngrok-free.app'
+  /// const callbackUrl = process.env['CALLBACK_URL'] ?? 'https://73e3-213-93-46-208.ngrok-free.app'
   const { sessionToken, userId } = await setupBunqClient()
-  await registerCallBack(sessionToken, userId, callbackUrl)
+  await listActiveCallbacks(sessionToken, userId)
+  // await registerCallBack(sessionToken, userId, callbackUrl)
 }
 
 doIt()
