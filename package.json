@@ -8,7 +8,8 @@
     "typecheck": "tsc --pretty --noEmit",
     "transpile": "tsc",
     "start": "npm run transpile && node dist/index.js",
-    "start:bunq": "npm run transpile && node dist/bunq/index.js"
+    "start:bunq": "npm run transpile && node dist/bunq/index.js",
+    "start:ynab": "npm run transpile && node dist/ynab/index.js"
   },
   "repository": {
     "type": "git",
