@@ -313,8 +313,8 @@ export async function listActiveCallbacks (sessionToken: string, userID: string)
   return activeCallbacks
 }
 
-export async function idempotentlyRegisterCallback () {
-  const callbackUrl = process.env['CALLBACK_URL'] ?? 'https://21be-213-93-46-208.ngrok-free.app'
+export async function idempotentlyRegisterCallback (url: string) {
+  const callbackUrl = url ?? process.env['CALLBACK_URL']
   console.log(`Starting process to register mutation callbacks to ${callbackUrl} \n`)
 
   console.log('Setting up bunq session \n')
@@ -344,5 +344,3 @@ export async function idempotentlyRegisterCallback () {
 
   if (!listWithNewCallback.includes(callbackUrl)) throw new Error('Registering callback process somehow failed')
 }
-
-idempotentlyRegisterCallback()

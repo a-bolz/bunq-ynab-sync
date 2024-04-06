@@ -1,0 +1,151 @@
+{
+  "Headers": {
+    "host": "fe8f-213-93-46-208.ngrok-free.app",
+    "user-agent": "bunq_callback/1.0",
+    "content-length": "2921",
+    "accept": "*/*",
+    "cache-control": "no-cache",
+    "content-type": "application/json",
+    "x-forwarded-for": "185.40.110.21",
+    "x-forwarded-host": "fe8f-213-93-46-208.ngrok-free.app",
+    "x-forwarded-proto": "https",
+    "accept-encoding": "gzip"
+  },
+  "Body": {
+    "NotificationUrl": {
+      "target_url": "https://fe8f-213-93-46-208.ngrok-free.app",
+      "category": "MUTATION",
+      "event_type": "MUTATION_RECEIVED",
+      "object": {
+        "Payment": {
+          "id": 1473856040,
+          "created": "2024-04-06 08:54:52.335564",
+          "updated": "2024-04-06 08:54:52.335564",
+          "monetary_account_id": 496019,
+          "amount": {
+            "currency": "EUR",
+            "value": "20.00"
+          },
+          "description": "",
+          "type": "BUNQ",
+          "merchant_reference": null,
+          "alias": {
+            "iban": "NL28BUNQ1234567891",
+            "is_light": false,
+            "display_name": "Andreas",
+            "avatar": {
+              "uuid": "1daf2f31-73cd-47d1-af93-34343cb8fbb9",
+              "image": [
+                {
+                  "attachment_public_uuid": "9a331d31-4257-4228-acb8-5a8426766fe9",
+                  "height": 768,
+                  "width": 1024,
+                  "content_type": "image/jpeg",
+                  "urls": [
+                    {
+                      "type": "ORIGINAL",
+                      "url": "https://bunq-prod-model-storage-public.s3.eu-central-1.amazonaws.com/bunq_file/File/content/fc557ecc8168d43a90f3ac95830349a1e6120270e89397007401e84a290c4813.jpg"
+                    }
+                  ]
+                }
+              ],
+              "anchor_uuid": null,
+              "style": "NONE"
+            },
+            "label_user": {
+              "uuid": "c872cd8b-ab6f-4102-bcfb-76454452760c",
+              "display_name": "Andreas",
+              "country": "NL",
+              "avatar": {
+                "uuid": "6c533558-ec03-4a5a-b522-809e98899da5",
+                "image": [
+                  {
+                    "attachment_public_uuid": "2a79c91c-3f00-4ead-99f3-854453bf8706",
+                    "height": 640,
+                    "width": 640,
+                    "content_type": "image/png",
+                    "urls": [
+                      {
+                        "type": "ORIGINAL",
+                        "url": "https://bunq-prod-model-storage-public.s3.eu-central-1.amazonaws.com/bunq_file/File/content/e627dab1418debb69a8ab983e7cd99a7b0cb8c289892dde90a8b2f12d5e23140.png"
+                      }
+                    ]
+                  }
+                ],
+                "anchor_uuid": "c872cd8b-ab6f-4102-bcfb-76454452760c",
+                "style": "NONE"
+              },
+              "public_nick_name": "Andreas",
+              "type": "PERSON"
+            },
+            "country": "NL"
+          },
+          "counterparty_alias": {
+            "iban": "NL97BUNQ0987654321",
+            "is_light": false,
+            "display_name": "A. Bolz",
+            "avatar": {
+              "uuid": "fc5692f7-41ec-42f5-943e-f95c44934228",
+              "image": [
+                {
+                  "attachment_public_uuid": "85b5d831-eedb-49aa-91d3-ab9c6a7104e7",
+                  "height": 1023,
+                  "width": 1024,
+                  "content_type": "image/png",
+                  "urls": [
+                    {
+                      "type": "ORIGINAL",
+                      "url": "https://bunq-prod-model-storage-public.s3.eu-central-1.amazonaws.com/bunq_file/File/content/2539e3272796436ca5024c8b3bb34362522923b2c3b41903e136d871304b99d1.png"
+                    }
+                  ]
+                }
+              ],
+              "anchor_uuid": null,
+              "style": "NONE"
+            },
+            "label_user": {
+              "uuid": "c872cd8b-ab6f-4102-bcfb-76454452760c",
+              "display_name": "A. Bolz",
+              "country": "NL",
+              "avatar": {
+                "uuid": "6c533558-ec03-4a5a-b522-809e98899da5",
+                "image": [
+                  {
+                    "attachment_public_uuid": "2a79c91c-3f00-4ead-99f3-854453bf8706",
+                    "height": 640,
+                    "width": 640,
+                    "content_type": "image/png",
+                    "urls": [
+                      {
+                        "type": "ORIGINAL",
+                        "url": "https://bunq-prod-model-storage-public.s3.eu-central-1.amazonaws.com/bunq_file/File/content/e627dab1418debb69a8ab983e7cd99a7b0cb8c289892dde90a8b2f12d5e23140.png"
+                      }
+                    ]
+                  }
+                ],
+                "anchor_uuid": "c872cd8b-ab6f-4102-bcfb-76454452760c",
+                "style": "NONE"
+              },
+              "public_nick_name": "Andreas",
+              "type": "PERSON"
+            },
+            "country": "NL"
+          },
+          "attachment": [],
+          "geolocation": null,
+          "batch_id": null,
+          "scheduled_id": null,
+          "address_billing": null,
+          "address_shipping": null,
+          "sub_type": "PAYMENT",
+          "request_reference_split_the_bill": [],
+          "balance_after_mutation": {
+            "currency": "EUR",
+            "value": "454.17"
+          },
+          "payment_auto_allocate_instance": null
+        }
+      }
+    }
+  }
+}

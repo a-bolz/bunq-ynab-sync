@@ -37,7 +37,10 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
+    "@ngrok/ngrok": "^1.2.0",
+    "@types/express": "^4.17.21",
     "dotenv": "^16.4.5",
+    "express": "^4.19.2",
     "node-fetch": "^3.3.2"
   }
 }
