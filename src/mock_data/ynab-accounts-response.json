@@ -1,0 +1,41 @@
+{
+  "data": {
+    "accounts": [
+      {
+        "id": "6fa6d858-be01-43fe-a732-aaf05d867c0b",
+        "name": "Daily spending",
+        "type": "checking",
+        "on_budget": true,
+        "closed": false,
+        "balance": 662750,
+        "cleared_balance": 383260,
+        "uncleared_balance": 279490,
+        "transfer_payee_id": "45a92845-a931-4ee3-964d-8c79d7355d45",
+        "direct_import_linked": false,
+        "direct_import_in_error": false,
+        "debt_interest_rates": {},
+        "debt_minimum_payments": {},
+        "debt_escrow_amounts": {},
+        "deleted": false
+      },
+      {
+        "id": "133f7c0e-a9a9-4a24-8c81-ddf7227d79c7",
+        "name": "Monthlies",
+        "type": "checking",
+        "on_budget": true,
+        "closed": false,
+        "balance": 4159360,
+        "cleared_balance": 4559360,
+        "uncleared_balance": -400000,
+        "transfer_payee_id": "50624c78-1540-4ab4-a4ce-ceeffef1d59d",
+        "direct_import_linked": false,
+        "direct_import_in_error": false,
+        "debt_interest_rates": {},
+        "debt_minimum_payments": {},
+        "debt_escrow_amounts": {},
+        "deleted": false
+      }
+    ],
+    "server_knowledge": 809
+  }
+}

@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
 import ynab from 'ynab'
-import type { PostTransactionsWrapper, TransactionFlagColor } from 'ynab'
+import type { TransactionFlagColor } from 'ynab'
 // import mockRequest from '../mock_data/bunq_request_body.json' assert { type: 'json' }
 
 dotenv.config()
@@ -36,10 +36,26 @@ interface SaveTransaction {
   cleared: 'cleared'
   //      * Whether or not the transaction is approved.  If not supplied, transaction will be unapproved by default.
   approved: boolean
-  flag_color: TransactionFlagColor
+  flag_color?: TransactionFlagColor
   //      * If specified, the new transaction will be assigned this `import_id` and considered "imported".  We will also attempt to match this imported transaction to an existing "user-entered" transation on the same account, with the same amount, and with a date +/-10 days from the imported transaction date.<br><br>Transactions imported through File Based Import or Direct Import (not through the API) are assigned an import_id in the format: 'YNAB:[milliunit_amount]:[iso_date]:[occurrence]'. For example, a transaction dated 2015-12-30 in the amount of -$294.23 USD would have an import_id of 'YNAB:-294230:2015-12-30:1'.  If a second transaction on the same account was imported and had the same date and same amount, its import_id would be 'YNAB:-294230:2015-12-30:2'.  Using a consistent format will prevent duplicates through Direct Import and File Based Import.<br><br>If import_id is omitted or specified as null, the transaction will be treated as a "user-entered" transaction. As such, it will be eligible to be matched against transactions later being imported (via DI, FBI, or API).
   // Should specify this as `BUNQ-AUTO-SYNC:${ generated-uuid }`
   import_id: string | null
+}
+
+export async function getAccounts () {
+  const budgetID = process.env['YNAB_BUDGET_ID']
+  const ynabAPI = getYnabApi()
+
+  if (!budgetID) {
+    throw new Error(`
+      Relevant YNAB budget id must be provided in env.
+      manually invoke listBudgets to see available options
+    `)
+  }
+
+  const response = await ynabAPI.accounts.getAccounts(budgetID)
+
+  console.log(JSON.stringify(response, null, 2))
 }
 
 export async function createTransaction () {
@@ -53,7 +69,18 @@ export async function createTransaction () {
   }
 
   try {
-    const transaction: SaveTransaction = {}
+    const transaction: SaveTransaction = {
+      account_id: '',
+      date: '',
+      amount: 0,
+      payee_id: '',
+      payee_name: '',
+      category_id: '',
+      memo: '',
+      cleared: 'cleared',
+      approved: true,
+      import_id: ''
+    }
     const response = await ynabAPI.transactions.createTransaction(budgetID, { transaction })
 
     console.log(JSON.stringify(response, null, 2))
@@ -62,4 +89,4 @@ export async function createTransaction () {
   }
 }
 
-createTransaction()
+getAccounts()
