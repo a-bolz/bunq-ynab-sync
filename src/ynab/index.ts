@@ -58,6 +58,13 @@ export async function getAccounts () {
   console.log(JSON.stringify(response, null, 2))
 }
 
+/*
+Edgecases to consider
+- Bunq payments in different currencies
+- Do internal transactions cause double callbacks? How to detect this
+- How to normalize multiple albert heijn transactions to one single payee/name/id
+*/
+
 export async function createTransaction () {
   const ynabAPI = getYnabApi()
   const budgetID = process.env['YNAB_BUDGET_ID']
@@ -70,6 +77,7 @@ export async function createTransaction () {
 
   try {
     const transaction: SaveTransaction = {
+      // Get direct from mapping or find by name through request?
       account_id: '',
       date: '',
       amount: 0,
