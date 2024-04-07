@@ -30,8 +30,6 @@ interface SaveTransaction {
   payee_id: string
   //      * The payee name.  If a `payee_name` value is provided and `payee_id` has a null value, the `payee_name` value will be used to resolve the payee by either (1) a matching payee rename rule (only if `import_id` is also specified) or (2) a payee with the same name or (3) creation of a new payee.
   payee_name: string | null
-  //      * The category for the transaction.  To configure a split transaction, you can specify null for `category_id` and provide a `subtransactions` array as part of the transaction object.  If an existing transaction is a split, the `category_id` cannot be changed.  Credit Card Payment categories are not permitted and will be ignored if supplied.
-  category_id: string | null
   memo: string | null
   cleared: 'cleared'
   //      * Whether or not the transaction is approved.  If not supplied, transaction will be unapproved by default.
@@ -58,11 +56,20 @@ export async function getAccounts () {
   console.log(JSON.stringify(response, null, 2))
 }
 
+function toMilliUnits (amount: number) {
+  return amount * 1000
+}
+
+function createImportID (): string {
+  return `bunq-2-ynab:${new Date().toISOString()}`
+}
+
 /*
 Edgecases to consider
 - Bunq payments in different currencies
 - Do internal transactions cause double callbacks? How to detect this
 - How to normalize multiple albert heijn transactions to one single payee/name/id
+- logic for finding payee id and name
 */
 
 export async function createTransaction () {
@@ -76,18 +83,20 @@ export async function createTransaction () {
   }
 
   try {
+    const payees = await getPayees()
+    const payee = payees.find((p) => p.name === 'Kruidvat') as unknown as Payee
     const transaction: SaveTransaction = {
       // Get direct from mapping or find by name through request?
-      account_id: '',
-      date: '',
-      amount: 0,
-      payee_id: '',
-      payee_name: '',
-      category_id: '',
+      account_id: '6fa6d858-be01-43fe-a732-aaf05d867c0b',
+      date: new Date().toISOString(),
+      amount: toMilliUnits(50.43),
+      payee_id: payee.id,
+      payee_name: payee.name,
+      // category_id: '', // do this manually
       memo: '',
       cleared: 'cleared',
       approved: true,
-      import_id: ''
+      import_id: createImportID()
     }
     const response = await ynabAPI.transactions.createTransaction(budgetID, { transaction })
 
@@ -97,4 +106,29 @@ export async function createTransaction () {
   }
 }
 
-getAccounts()
+interface Payee {
+  id: string
+  name: string
+  deleted: boolean
+}
+
+export async function getPayees (): Promise<Payee[]> {
+  const ynabAPI = getYnabApi()
+  const budgetID = process.env['YNAB_BUDGET_ID']
+  if (!budgetID) {
+    throw new Error(`
+      Relevant YNAB budget id must be provided in env.
+      manually invoke listBudgets to see available options
+    `)
+  }
+
+  try {
+    const response = await ynabAPI.payees.getPayees(budgetID)
+    return response.data.payees
+  } catch (error) {
+    console.log('Error creating transaction', error)
+    throw error
+  }
+}
+createTransaction()
+// getAccounts()
