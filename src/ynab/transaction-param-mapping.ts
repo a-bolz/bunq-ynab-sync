@@ -22,7 +22,7 @@ const accountMapping = {
   }
 }
 
-export async function getYnabParamsFromBunqPayload (bunqPayment: Payment): Promise<Partial<SaveTransaction>> {
+export async function getYnabParamsFromBunqPayload (bunqPayment: Payment): Promise<SaveTransaction> {
   const iban = bunqPayment.alias.iban as keyof typeof accountMapping
   const accountID = accountMapping[iban].ynabId
   if (!accountID) throw new Error('Error establishing which ynab account the transaction belongs to ' + iban)
@@ -45,7 +45,8 @@ export async function getYnabParamsFromBunqPayload (bunqPayment: Payment): Promi
     payee_id: payee.id,
     payee_name: payee.name,
     category_id: categoryID,
-    flag_color: flagColor
+    flag_color: flagColor,
+    memo: ''
   }
 }
 

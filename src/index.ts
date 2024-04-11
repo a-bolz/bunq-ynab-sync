@@ -2,6 +2,7 @@ import express from 'express'
 import ngrok from '@ngrok/ngrok'
 import dotenv from 'dotenv'
 import { idempotentlyRegisterCallback } from './bunq/index.js'
+import { getCreateTransactionParams } from './ynab/index.js'
 
 dotenv.config()
 
@@ -26,13 +27,17 @@ app.get('/', function (req, res) {
   res.send('hello world')
 })
 
-app.post('/', function (req, res) {
+app.post('/', async (req, res) => {
   console.log('Received a POST request')
   console.log(`Method: ${req.method}`)
   console.log(`URL: ${req.originalUrl}`)
   console.log(`Headers: ${JSON.stringify(req.headers, null, 2)}`)
   // Log the body of the POST request
   console.log(`Body: ${JSON.stringify(req.body, null, 2)}`)
+
+  console.log('Retrieving ynab POST Params from bunq request')
+  const transactionParams = await getCreateTransactionParams(req.body as unknown as any)
+  console.log('result', JSON.stringify({ transactionParams }, null, 2))
 
   res.send('POST request received')
 })
@@ -47,7 +52,7 @@ ngrok.connect({ addr: PORT_ADDRESS, authtoken: NGROK_AUTHTOKEN })
     console.log(`Ingress established at: ${listener.url()}`)
     // Deregister and register callbacks with the new URL
 
-    await idempotentlyRegisterCallback(listener.url() as string)
+    await idempotentlyRegisterCallback(listener.url()!)
   })
   .catch(error => {
     console.error('Error establishing ngrok connection:', error)
