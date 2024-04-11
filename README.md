@@ -41,3 +41,9 @@ openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
 openssl rsa -pubout -in private.pem -out public.pem
 
 als the required environment variables need to be set (see .env.sample).
+
+## TODO
+
+- Finish / make more robust establishing a connection to bunq.
+IP-addresses should not be hardcoded. 
+- 
