@@ -11,6 +11,12 @@ const isPayment = (arg: any): arg is Payment => {
 export async function getCreateTransactionParams (bunqRequest: any): Promise<any> {
   try {
     const payment = bunqRequest?.NotificationUrl?.object?.Payment
+    console.log(JSON.stringify({
+      bunqRequest,
+      NotificationUrl: bunqRequest.NotificationUrl,
+      object: bunqRequest.NotificationUrl.object,
+      Payment: bunqRequest.NotificationUrl.object.Payment
+    }, null, 2))
     if (!isPayment(payment)) throw new Error('Non payment received!')
 
     console.log('this is what the payment is', JSON.stringify(payment, null, 2))
