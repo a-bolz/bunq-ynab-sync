@@ -53,7 +53,8 @@ export async function createTransaction (transaction: SaveTransaction) {
     `)
   }
   try {
-    await ynabAPI.transactions.createTransaction(budgetID, { transaction })
+    const result = await ynabAPI.transactions.createTransaction(budgetID, { transaction })
+    console.log('succesfully created transaction', result)
   } catch (error) {
     console.log('Error creating transaction', error)
   }
@@ -72,6 +73,25 @@ export async function getPayees (): Promise<Payee[]> {
   try {
     const response = await ynabAPI.payees.getPayees(budgetID)
     return response.data.payees
+  } catch (error) {
+    console.log('Error creating transaction', error)
+    throw error
+  }
+}
+
+export async function getCategories (): Promise<Payee[]> {
+  const ynabAPI = getYnabApi()
+  const budgetID = process.env['YNAB_BUDGET_ID']
+  if (!budgetID) {
+    throw new Error(`
+      Relevant YNAB budget id must be provided in env.
+      manually invoke listBudgets to see available options
+    `)
+  }
+
+  try {
+    const response = await ynabAPI.categories.getCategories(budgetID)
+    return response.data.category_groups
   } catch (error) {
     console.log('Error creating transaction', error)
     throw error

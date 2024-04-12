@@ -1,6 +1,8 @@
 // do stuff here
 import { getYnabParamsFromBunqPayload } from './transaction-param-mapping.js'
+import { createTransaction } from './api.js'
 import { writeLog } from '../bunq/files.js'
+import todos from '../mock_data/todo-request.json' assert { type: 'json' }
 
 import type { Payment } from '../bunq/type.ts'
 
@@ -11,12 +13,6 @@ const isPayment = (arg: any): arg is Payment => {
 export async function getCreateTransactionParams (bunqRequest: any): Promise<any> {
   try {
     const payment = bunqRequest?.NotificationUrl?.object?.Payment
-    console.log(JSON.stringify({
-      bunqRequest,
-      NotificationUrl: bunqRequest.NotificationUrl,
-      object: bunqRequest.NotificationUrl.object,
-      Payment: bunqRequest.NotificationUrl.object.Payment
-    }, null, 2))
     if (!isPayment(payment)) throw new Error('Non payment received!')
 
     console.log('this is what the payment is', JSON.stringify(payment, null, 2))
@@ -28,4 +24,13 @@ export async function getCreateTransactionParams (bunqRequest: any): Promise<any
     console.log('error computing ynab transaction params', error)
     writeLog(JSON.stringify({ bunqRequest, transactionParams: { error } }, null, 2))
   }
+}
+
+for (const todo of todos.slice(0, 1)) {
+  const payment = todo.Payment as unknown as Payment
+  getYnabParamsFromBunqPayload(payment)
+    .then((params) => {
+      console.log(JSON.stringify({ payment: todo, params }, null, 2))
+      createTransaction(params)
+    })
 }

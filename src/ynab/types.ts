@@ -7,11 +7,11 @@ export interface SaveTransaction {
   //      * The transaction amount in milliunits format.  Split transaction amounts cannot be changed and if a different amount is supplied it will be ignored.
   amount: number
   //      * The payee for the transaction.  To create a transfer between two accounts, use the account transfer payee pointing to the target account.  Account transfer payees are specified as `tranfer_payee_id` on the account resource.
-  payee_id: string
+  payee_id: string | null
   //      * The payee name.  If a `payee_name` value is provided and `payee_id` has a null value, the `payee_name` value will be used to resolve the payee by either (1) a matching payee rename rule (only if `import_id` is also specified) or (2) a payee with the same name or (3) creation of a new payee.
   payee_name: string | null
-  memo: string | null
-  category_id: string | null
+  // memo: string | null
+  // category_id: string | null
   cleared: 'cleared'
   //      * Whether or not the transaction is approved.  If not supplied, transaction will be unapproved by default.
   approved: boolean
@@ -22,7 +22,8 @@ export interface SaveTransaction {
 }
 
 export interface Payee {
-  id: string
+  id: string | null
   name: string
+  transfer_account_id?: string | null | undefined
   deleted: boolean
 }

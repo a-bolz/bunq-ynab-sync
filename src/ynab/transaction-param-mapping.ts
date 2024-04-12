@@ -1,4 +1,6 @@
 import { createImportID, toMilliUnits } from './utils.js'
+import { getPayees, getCategories } from './api.js'
+import { normalizePayee } from './normalize-payee.js'
 import type { TransactionFlagColor } from 'ynab'
 import type { Payment } from '../bunq/type.ts'
 import type { SaveTransaction, Payee } from './types'
@@ -20,12 +22,24 @@ const accountMapping = {
     name: 'TAX Reserve',
     ynabId: '7f642eaf-169e-4141-abd5-baf117157093'
   }
-}
+} as const
+
+// function isInternal(bunqPayment: Payment) {
+//   const from = accountMapping[bunqPayment.alias.iban]
+//   const to = accountMapping[bunqPayment.counterparty_alias.iban]
+//   if (from && to) {
+//     return {
+//       from: from.name,
+//       to: to.name
+//     }
+// }
 
 export async function getYnabParamsFromBunqPayload (bunqPayment: Payment): Promise<SaveTransaction> {
   const iban = bunqPayment.alias.iban as keyof typeof accountMapping
   const accountID = accountMapping[iban].ynabId
   if (!accountID) throw new Error('Error establishing which ynab account the transaction belongs to ' + iban)
+
+  //  const isToSelf = isInternal(bunqPayment)
 
   const amount = getAmount(bunqPayment)
 
@@ -33,7 +47,7 @@ export async function getYnabParamsFromBunqPayload (bunqPayment: Payment): Promi
 
   const categoryID = await getYnabCategoryId(bunqPayment, payee)
 
-  const flagColor = getFlagColor(bunqPayment)
+  // const flagColor = getFlagColor(bunqPayment)
 
   return {
     amount,
@@ -44,9 +58,9 @@ export async function getYnabParamsFromBunqPayload (bunqPayment: Payment): Promi
     date: new Date().toISOString(),
     payee_id: payee.id,
     payee_name: payee.name,
-    category_id: categoryID,
-    flag_color: flagColor,
-    memo: ''
+    ...(categoryID ? { category_id: categoryID } : {})
+    // category_id: categoryID,
+    // flag_color: flagColor,
   }
 }
 
@@ -69,8 +83,7 @@ export function getFlagColor (bunqPayment: Payment): TransactionFlagColor | unde
   Creditcard
   Automatic bank transfer?
 */
-  console.log(bunqPayment)
-  return 'red'
+  return bunqPayment && 'red'
 }
 
 /*
@@ -81,10 +94,21 @@ does this work like:
 - otherwise just post name and new id will be created?
 */
 export async function getYnabPayee (bunqPayment: Payment): Promise<Payee> {
-  console.log(bunqPayment)
-  return {
-    id: '',
-    name: '',
+  const counterParty = normalizePayee(bunqPayment.counterparty_alias.display_name)
+  const existingPayees = await getPayees()
+  const targetIban = bunqPayment.counterparty_alias.iban
+  const knownAccount = accountMapping[targetIban as keyof typeof accountMapping]
+
+  const existingPayee = existingPayees.find((payee) => {
+    if (knownAccount) {
+      // this is an internal transaction
+      return payee.transfer_account_id === knownAccount.ynabId
+    }
+    return payee.name === counterParty
+  })
+  return existingPayee ?? {
+    id: null,
+    name: counterParty,
     deleted: false
   }
 }
@@ -93,8 +117,10 @@ export async function getYnabPayee (bunqPayment: Payment): Promise<Payee> {
 Nice to have. Could be just a simple map that grows over time
 */
 export async function getYnabCategoryId (bunqPayment: Payment, payee: Payee): Promise<string> {
-  console.log({ bunqPayment, payee })
-  return ''
+  const categoryGroups = await getCategories()
+  const what = false
+  if (what) console.log(JSON.stringify({ categoryGroups }, null, 2))
+  return bunqPayment && payee && ''
 }
 
 function getAmount (p: Payment): number {
