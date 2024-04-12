@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'url'
 import { join, dirname } from 'path'
 import { writeFileSync, readFileSync, existsSync } from 'fs'
-import { appendFile } from 'fs/promises'
+import { appendFile, mkdir } from 'fs/promises'
 
 export function getDirname (metaUrl: string): string {
   const filename = fileURLToPath(metaUrl)
@@ -48,17 +48,21 @@ export const writeLog = async (logMessage: string) => {
   const fileName = `${date}.txt` // Log file name with today's date
 
   // Construct the file path
-  const path = join(
+  const logDirectory = join(
     getDirname(import.meta.url),
     '..',
     '..',
     'tmp',
-    'log',
-    fileName
+    'log'
   )
+  const filePath = join(logDirectory, fileName)
 
   try {
-    await appendFile(path, logMessage + '\n')
+    // Ensure the log directory exists
+    await mkdir(logDirectory, { recursive: true })
+
+    // Append the log message to the file, create file if it does not exist
+    await appendFile(filePath, logMessage + '\n')
     console.log('Log written successfully')
   } catch (error) {
     console.error('Failed to write log:', error)
