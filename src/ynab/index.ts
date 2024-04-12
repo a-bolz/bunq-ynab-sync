@@ -13,6 +13,8 @@ export async function getCreateTransactionParams (bunqRequest: any): Promise<any
     const payment = bunqRequest?.Body?.NotificationUrl?.object?.Payment
     if (!isPayment(payment)) throw new Error('Non payment received!')
 
+    console.log('this is what the payment is', JSON.stringify(payment, null, 2))
+
     const transactionParams = await getYnabParamsFromBunqPayload(payment)
     console.log('computed transaction params are', transactionParams)
     writeLog(JSON.stringify({ bunqRequest, transactionParams }, null, 2))
