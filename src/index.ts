@@ -34,10 +34,7 @@ app.post('/', async (req, res) => {
   console.log(`Headers: ${JSON.stringify(req.headers, null, 2)}`)
   // Log the body of the POST request
   console.log(`Body: ${JSON.stringify(req.body, null, 2)}`)
-
-  console.log('Retrieving ynab POST Params from bunq request')
-  const transactionParams = await getCreateTransactionParams(req.body as unknown as any)
-  console.log('result', JSON.stringify({ transactionParams }, null, 2))
+  getCreateTransactionParams(req.body)
 
   res.send('POST request received')
 })
