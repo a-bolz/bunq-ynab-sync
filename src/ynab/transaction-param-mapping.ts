@@ -1,43 +1,15 @@
 import { createImportID, toMilliUnits } from './utils.js'
 import { getPayees, getCategories } from './api.js'
 import { normalizePayee } from './normalize-payee.js'
+import accountMapping from '../../tmp/account-mapping.json'
 import type { TransactionFlagColor } from 'ynab'
 import type { Payment } from '../bunq/type.ts'
 import type { SaveTransaction, Payee } from './types'
 
-const accountMapping = {
-  NL97BUNQ2291054317: {
-    name: 'Monthlies',
-    ynabId: '133f7c0e-a9a9-4a24-8c81-ddf7227d79c7'
-  },
-  NL28BUNQ2291054686: {
-    name: 'Daily spending',
-    ynabId: '6fa6d858-be01-43fe-a732-aaf05d867c0b'
-  },
-  NL22BUNQ2291054600: {
-    name: 'Komposit',
-    ynabId: '69dcce0e-124f-4a84-ad7c-4a6fd7c355ff'
-  },
-  NL72BUNQ2291054767: {
-    name: 'TAX Reserve',
-    ynabId: '7f642eaf-169e-4141-abd5-baf117157093'
-  }
-} as const
-
-// function isInternal(bunqPayment: Payment) {
-//   const from = accountMapping[bunqPayment.alias.iban]
-//   const to = accountMapping[bunqPayment.counterparty_alias.iban]
-//   if (from && to) {
-//     return {
-//       from: from.name,
-//       to: to.name
-//     }
-// }
-
 export async function getYnabParamsFromBunqPayload (bunqPayment: Payment): Promise<SaveTransaction> {
   const iban = bunqPayment.alias.iban as keyof typeof accountMapping
   const accountID = accountMapping[iban].ynabId
-  if (!accountID) throw new Error('Error establishing which ynab account the transaction belongs to ' + iban)
+  if (!accountID) throw new Error(`Error establishing which ynab account the transaction belongs to  ${String(iban)}`)
 
   //  const isToSelf = isInternal(bunqPayment)
 
