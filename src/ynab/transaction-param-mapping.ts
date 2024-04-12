@@ -1,4 +1,4 @@
-import { createImportID, toMilliUnits } from './utils'
+import { createImportID, toMilliUnits } from './utils.js'
 import type { TransactionFlagColor } from 'ynab'
 import type { Payment } from '../bunq/type.ts'
 import type { SaveTransaction, Payee } from './types'

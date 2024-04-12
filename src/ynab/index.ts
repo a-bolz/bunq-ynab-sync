@@ -1,5 +1,5 @@
 // do stuff here
-import { getYnabParamsFromBunqPayload } from './transaction-param-mapping'
+import { getYnabParamsFromBunqPayload } from './transaction-param-mapping.js'
 
 import type { Payment } from '../bunq/type.ts'
 
