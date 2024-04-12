@@ -52,12 +52,7 @@ export async function createTransaction (transaction: SaveTransaction) {
       manually invoke listBudgets to see available options
     `)
   }
-  try {
-    const result = await ynabAPI.transactions.createTransaction(budgetID, { transaction })
-    console.log('succesfully created transaction', result)
-  } catch (error) {
-    console.log('Error creating transaction', error)
-  }
+  return await ynabAPI.transactions.createTransaction(budgetID, { transaction })
 }
 
 export async function getPayees (): Promise<Payee[]> {
