@@ -5,7 +5,7 @@ import { writeLog } from '../bunq/files.js'
 import type { Payment } from '../bunq/type.ts'
 
 const isPayment = (arg: any): arg is Payment => {
-  return typeof arg?.id === 'string' && typeof arg?.created === 'string'
+  return typeof arg?.id === 'number' && typeof arg?.created === 'string'
 }
 
 export async function getCreateTransactionParams (bunqRequest: any): Promise<any> {
