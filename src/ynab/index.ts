@@ -4,9 +4,16 @@ import { writeLog } from '../bunq/files.js'
 
 import type { Payment } from '../bunq/type.ts'
 
-export async function getCreateTransactionParams (bunqRequest: Payment): Promise<any> {
+const isPayment = (arg: any): arg is Payment => {
+  return typeof arg?.id === 'string' && typeof arg?.created === 'string'
+}
+
+export async function getCreateTransactionParams (bunqRequest: any): Promise<any> {
   try {
-    const transactionParams = await getYnabParamsFromBunqPayload(bunqRequest)
+    const payment = bunqRequest?.Body?.NotificationUrl?.object?.Payment
+    if (!isPayment(payment)) throw new Error('Non payment received!')
+
+    const transactionParams = await getYnabParamsFromBunqPayload(payment)
     console.log('computed transaction params are', transactionParams)
     writeLog(JSON.stringify({ bunqRequest, transactionParams }, null, 2))
   } catch (error) {
