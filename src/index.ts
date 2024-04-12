@@ -16,17 +16,6 @@ const app = express()
 // Middleware to parse JSON bodies
 app.use(express.json())
 
-app.get('/', function (req, res) {
-  console.log('Received a GET request')
-  console.log(`Method: ${req.method}`)
-  console.log(`URL: ${req.originalUrl}`)
-  console.log(`Headers: ${JSON.stringify(req.headers, null, 2)}`)
-  // GET requests don't have a body, so we log query parameters instead
-  console.log(`Query: ${JSON.stringify(req.query, null, 2)}`)
-
-  res.send('hello world')
-})
-
 app.post('/', async (req, res) => {
   console.log('Received a POST request')
   console.log(`Method: ${req.method}`)
