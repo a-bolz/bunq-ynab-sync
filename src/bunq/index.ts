@@ -314,8 +314,8 @@ export async function listActiveCallbacks (sessionToken: string, userID: string)
   return activeCallbacks
 }
 
-export async function idempotentlyRegisterCallback (url: string) {
-  const callbackUrl = url ?? process.env['CALLBACK_URL']
+export async function idempotentlyRegisterCallback (callbackUrl: string) {
+  if (!callbackUrl) throw new Error('Valid callback url must be provided')
   console.log(`Starting process to register mutation callbacks to ${callbackUrl} \n`)
 
   console.log('Setting up bunq session \n')
@@ -390,3 +390,5 @@ export const drop = (keys: string[]) => (obj: Record<string, any>) => {
     return acc
   }, {})
 }
+
+idempotentlyRegisterCallback(process.env['SERVICE_PUBLIC_URL'] ?? '')

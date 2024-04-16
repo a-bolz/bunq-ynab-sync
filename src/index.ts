@@ -1,7 +1,5 @@
 import express from 'express'
-import ngrok from '@ngrok/ngrok'
 import dotenv from 'dotenv'
-import { idempotentlyRegisterCallback } from './bunq/index.js'
 import { syncTransaction } from './ynab/index.js'
 
 dotenv.config()
@@ -31,15 +29,3 @@ app.post('/', async (req, res) => {
 app.listen(PORT_ADDRESS, () => {
   console.log(`Server listening on port ${PORT_ADDRESS}...`)
 })
-
-// Get your endpoint online
-ngrok.connect({ addr: PORT_ADDRESS, authtoken: NGROK_AUTHTOKEN })
-  .then(async (listener) => {
-    console.log(`Ingress established at: ${listener.url()}`)
-    // Deregister and register callbacks with the new URL
-
-    await idempotentlyRegisterCallback(listener.url()!)
-  })
-  .catch(error => {
-    console.error('Error establishing ngrok connection:', error)
-  })
