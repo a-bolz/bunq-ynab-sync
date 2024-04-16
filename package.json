@@ -1,7 +1,7 @@
 {
-  "name": "typescript-starter-2024",
+  "name": "bunq-ynab-sync",
   "version": "1.0.0",
-  "description": "a typescript starter for 2024",
+  "description": "a webservice that syncs bunq transactions to a ynab budget",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:a-bolz/ts-2024.git"
+    "url": "git@github.com:a-bolz/bunq-ynab-sync.git"
   },
   "keywords": [
     "typescript",
@@ -24,9 +24,9 @@
   "author": "Andreas Bolz",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/a-bolz/ts-2024/issues"
+    "url": "https://github.com/a-bolz/bunq-ynab-sync/issues"
   },
-  "homepage": "https://github.com/a-bolz/ts-2024#readme",
+  "homepage": "https://github.com/a-bolz/bunq-ynab-sync#readme",
   "devDependencies": {
     "@types/node": "^20.12.3",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
