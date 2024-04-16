@@ -344,3 +344,48 @@ export async function idempotentlyRegisterCallback (url: string) {
 
   if (!listWithNewCallback.includes(callbackUrl)) throw new Error('Registering callback process somehow failed')
 }
+
+export async function listCardActions () {
+  const { sessionToken, userId } = await setupBunqClient()
+  const monetaryAccountEndpoint = `/user/${userId}/monetary-account`
+  const mastercardActionEndpoint = (monetaryAccountId: string) => `${monetaryAccountEndpoint}/${monetaryAccountId}/mastercard-action`
+  const headers = {
+    'Content-Type': 'application/json',
+    'User-Agent': 'Andreas MBPRO', // Customize with your actual User-Agent
+    'X-Bunq-Client-Authentication': sessionToken
+  }
+
+  const response = await fetch(`${bunqApiUrl}${mastercardActionEndpoint('496019')}`, {
+    method: 'GET',
+    headers
+  })
+
+  const data = await response.json() as any
+
+  if (!response.ok) {
+    console.error('API call failed with status:', response.status)
+    console.error('Error response body:', JSON.stringify(data, null, 2))
+    throw new Error(`API call failed: ${response.status}`)
+  }
+
+  console.log(JSON.stringify(data, null, 2))
+  return data
+}
+
+export const pick = (keys: string[]) => (obj: Record<string, any>) => {
+  return Object.entries(obj).filter((el) => {
+    return keys.includes(el[0])
+  }).reduce((acc: Record<string, any>, cv: [string, any]) => {
+    acc[cv[0]] = cv[1]
+    return acc
+  }, {})
+}
+
+export const drop = (keys: string[]) => (obj: Record<string, any>) => {
+  return Object.entries(obj).filter((el) => {
+    return !keys.includes(el[0])
+  }).reduce((acc: Record<string, any>, cv: [string, any]) => {
+    acc[cv[0]] = cv[1]
+    return acc
+  }, {})
+}

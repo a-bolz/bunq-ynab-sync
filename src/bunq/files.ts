@@ -29,6 +29,7 @@ export function readTmpFile (fileName: string) {
     getDirname(import.meta.url),
     '..',
     '..',
+    '..',
     'tmp',
     fileName
   )

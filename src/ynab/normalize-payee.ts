@@ -10,5 +10,13 @@ const simplifications = [
   {
     result: 'Zeeman',
     pattern: /zeeman/i
+  },
+  {
+    result: 'Albert Heijn',
+    pattern: /albert heijn/i
+  },
+  {
+    result: 'Lidl',
+    pattern: /lidl/i
   }
 ]
