@@ -7,7 +7,7 @@
   "scripts": {
     "typecheck": "tsc --pretty --noEmit",
     "transpile": "tsc",
-    "start": "npm run transpile && node dist/index.js",
+    "start": "npm run transpile && node dist/src/index.js",
     "start:bunq": "npm run transpile && node dist/src/bunq/index.js",
     "start:ynab": "npm run transpile && node dist/src/ynab/index.js"
   },
