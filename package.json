@@ -7,9 +7,14 @@
   "scripts": {
     "typecheck": "tsc --pretty --noEmit",
     "transpile": "tsc",
-    "start": "npm run transpile && node dist/src/index.js",
+    "start": "npm run transpile && pm2 start dist/src/index.js --name 'app-main'",
     "start:bunq": "npm run transpile && node dist/src/bunq/index.js",
-    "start:ynab": "npm run transpile && node dist/src/ynab/index.js"
+    "start:ynab": "npm run transpile && node dist/src/ynab/index.js",
+    "stop": "pm2 stop all",
+    "restart": "pm2 restart all",
+    "delete": "pm2 delete all",
+    "status": "pm2 status",
+    "logs": "pm2 logs"
   },
   "repository": {
     "type": "git",
@@ -35,6 +40,7 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
+    "pm2": "^5.3.1",
     "typescript": "^5.4.3"
   },
   "dependencies": {
