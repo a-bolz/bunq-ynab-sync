@@ -1,7 +1,7 @@
 import { createImportID, toMilliUnits } from './utils.js'
 import { getPayees, getCategories } from './api.js'
 import { normalizePayee } from './normalize-payee.js'
-import accountMapping from '../../tmp/account-mapping.json'
+import accountMapping from '../../tmp/account-mapping.json' assert { type: 'json' }
 import type { TransactionFlagColor } from 'ynab'
 import type { Payment } from '../bunq/type.ts'
 import type { SaveTransaction, Payee } from './types'
