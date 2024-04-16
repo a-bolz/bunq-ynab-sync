@@ -122,10 +122,11 @@ export async function registerDevice (installationToken: string) {
   } catch (error) {
     console.log('Stil need to register device. Talking to bunq next')
   }
+  const permittedIps = process.env['BUNQ_PERMITTED_IPS']
   const requestBody = JSON.stringify({
-    description: 'my mb pro',
+    description: process.env['BUNQ_KEY_DESCRIPTION'] ?? 'my mb pro',
     secret: process?.env?.['BUNQ_API_KEY'],
-    permitted_ips: ['213.93.46.208'] // my current ip i guess
+    permitted_ips: permittedIps ? permittedIps.split(',') : ['213.93.46.208'] // my current ip i guess
   })
 
   const response = await fetch(`${bunqApiUrl}/device-server`, {
